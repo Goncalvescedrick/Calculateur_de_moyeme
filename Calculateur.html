@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculateur de moyenne S3</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --danger-color: #ef4444;
+            --danger-hover: #dc2626;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #1e293b;
+            --border-color: #e2e8f0;
+            --border-radius: 8px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --transition: all 0.2s ease;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.5;
+        }
+
+        h1, h2, h3 {
+            color: #0f172a;
+            margin-top: 0;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: var(--transition);
+            box-sizing: border-box;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+        }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            align-items: end;
+            margin-bottom: 20px;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        button:hover {
+            background-color: var(--primary-hover);
+        }
+
+        button.secondary {
+            background-color: var(--danger-color);
+        }
+
+        button.secondary:hover {
+            background-color: var(--danger-hover);
+        }
+        
+        button.add-btn {
+            height: 42px; /* Match input height */
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .module {
+            background-color: var(--bg-color);
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .module-info {
+            flex-grow: 1;
+        }
+        
+        .module-info h3 {
+            margin-bottom: 5px;
+            font-size: 1.1rem;
+        }
+        
+        .module-info p {
+            margin: 0;
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+
+        .error-message {
+            color: var(--danger-color);
+            background-color: #fef2f2;
+            border: 1px solid #fecaca;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            display: none;
+            font-size: 0.9rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: var(--card-bg);
+        }
+
+        th, td {
+            border-bottom: 1px solid var(--border-color);
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: var(--bg-color);
+            font-weight: 600;
+            color: #475569;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tfoot th, tfoot td {
+            background-color: var(--bg-color);
+            border-top: 2px solid var(--primary-color);
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 30px;
+            color: #94a3b8;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Calculateur de moyenne du semestre</h1>
+
+        <div id="errorContainer" class="error-message"></div>
+
+        <div class="form-group">
+            <label for="moduleSelect">Nom du module :</label>
+            <select id="moduleSelect">
+                <option value="Mathématiques">Mathématiques</option>
+                <option value="Anglais">Anglais</option>
+                <option value="Programmation C">Programmation C</option>
+                <option value="Programmation JAVA">Programmation JAVA</option>
+                <option value="Base de données">Base de données</option>
+                <option value="autre">Autre...</option>
+            </select>
+        </div>
+        
+        <div class="form-group" id="customModuleGroup" style="display: none;">
+            <label for="moduleCustom">Nom personnalisé :</label>
+            <input type="text" id="moduleCustom" placeholder="Saisissez le nom du module">
+        </div>
+
+        <div class="input-row">
+            <div>
+                <label for="note1">Note 1 (sur 20) :</label>
+                <input type="number" id="note1" min="0" max="20" step="0.1" placeholder="Ex: 14.5">
+            </div>
+            <div>
+                <label for="note2">Note 2 (sur 20) :</label>
+                <input type="number" id="note2" min="0" max="20" step="0.1" placeholder="Ex: 12">
+            </div>
+            <div>
+                <label for="coefficient">Coefficient :</label>
+                <input type="number" id="coefficient" min="1" value="1">
+            </div>
+            <div>
+                <button onclick="ajouterModule()" class="add-btn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                    Ajouter
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>Modules enregistrés</h2>
+        <div id="modulesAffiches"></div>
+        
+        <div class="actions">
+            <button onclick="calculerMoyennes()">Calculer les moyennes</button>
+            <button onclick="reinitialiser()" class="secondary">Tout réinitialiser</button>
+        </div>
+
+        <div id="resultat"></div>
+    </div>
+
+    <script>
+        let modules = [];
+        let customOptions = [];
+
+        function renderModuleOptions() {
+            const select = document.getElementById('moduleSelect');
+            const currentVal = select.value;
+            
+            let optionsHTML = `
+                <option value="Mathématiques">Mathématiques</option>
+                <option value="Anglais">Anglais</option>
+                <option value="Programmation C">Programmation C</option>
+                <option value="Programmation JAVA">Programmation JAVA</option>
+                <option value="Base de données">Base de données</option>
+            `;
+            
+            customOptions.forEach(opt => {
+                optionsHTML += `<option value="${opt}">${opt}</option>`;
+            });
+            
+            optionsHTML += `<option value="autre">Autre...</option>`;
+            
+            select.innerHTML = optionsHTML;
+            
+            if (currentVal && Array.from(select.options).some(o => o.value === currentVal)) {
+                select.value = currentVal;
+            }
+        }
+
+        // Initialisation et chargement des données depuis le localStorage
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedModules = localStorage.getItem('modulesS3');
+            if (savedModules) {
+                try {
+                    modules = JSON.parse(savedModules);
+                    afficherModules();
+                } catch (e) {
+                    console.error("Erreur lors de la lecture du localStorage", e);
+                }
+            } else {
+                afficherModules();
+            }
+
+            const savedOptions = localStorage.getItem('customOptions');
+            if (savedOptions) {
+                try {
+                    customOptions = JSON.parse(savedOptions);
+                } catch (e) {
+                    console.error("Erreur lors de la lecture des options", e);
+                }
+            }
+            renderModuleOptions();
+
+            // Gestion de l'affichage du champ personnalisé
+            document.getElementById('moduleSelect').addEventListener('change', function () {
+                const customGroup = document.getElementById('customModuleGroup');
+                customGroup.style.display = this.value === 'autre' ? 'block' : 'none';
+                if(this.value === 'autre') {
+                    document.getElementById('moduleCustom').focus();
+                }
+            });
+
+            // Ajout avec la touche Entrée
+            const inputs = ['note1', 'note2', 'coefficient', 'moduleCustom'];
+            inputs.forEach(id => {
+                document.getElementById(id).addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        ajouterModule();
+                    }
+                });
+            });
+        });
+
+        function sauvegarderDonnees() {
+            localStorage.setItem('modulesS3', JSON.stringify(modules));
+        }
+
+        function showError(message) {
+            const errorContainer = document.getElementById('errorContainer');
+            errorContainer.textContent = message;
+            errorContainer.style.display = 'block';
+            setTimeout(() => {
+                errorContainer.style.display = 'none';
+            }, 5000);
+        }
+
+        function hideError() {
+            document.getElementById('errorContainer').style.display = 'none';
+        }
+
+        function ajouterModule() {
+            hideError();
+            
+            const moduleSelect = document.getElementById('moduleSelect');
+            const moduleCustom = document.getElementById('moduleCustom');
+            const note1Input = document.getElementById('note1');
+            const note2Input = document.getElementById('note2');
+            const coeffInput = document.getElementById('coefficient');
+
+            let nomModule = moduleSelect.value;
+            if (nomModule === 'autre') {
+                nomModule = moduleCustom.value.trim();
+                if (nomModule === '') {
+                    showError("Veuillez entrer un nom pour le module personnalisé.");
+                    return;
+                }
+                
+                // Enregistrer ce nouveau module dans la liste déroulante
+                if (!customOptions.includes(nomModule)) {
+                    customOptions.push(nomModule);
+                    localStorage.setItem('customOptions', JSON.stringify(customOptions));
+                    renderModuleOptions();
+                }
+            }
+
+            const note1 = parseFloat(note1Input.value);
+            const note2 = parseFloat(note2Input.value);
+            const coefficient = parseFloat(coeffInput.value);
+
+            if (isNaN(note1) || note1 < 0 || note1 > 20) {
+                showError("La Note 1 doit être un nombre compris entre 0 et 20.");
+                return;
+            }
+            if (isNaN(note2) || note2 < 0 || note2 > 20) {
+                showError("La Note 2 doit être un nombre compris entre 0 et 20.");
+                return;
+            }
+            if (isNaN(coefficient) || coefficient <= 0) {
+                showError("Le coefficient doit être un nombre strictement positif.");
+                return;
+            }
+
+            const moyenneModule = (note1 + note2) / 2;
+
+            modules.push({
+                id: Date.now(),
+                nom: nomModule,
+                note1: note1,
+                note2: note2,
+                coefficient: coefficient,
+                moyenne: moyenneModule
+            });
+
+            // Reset UI
+            note1Input.value = '';
+            note2Input.value = '';
+            coeffInput.value = '1';
+            moduleCustom.value = '';
+            moduleSelect.value = 'Mathématiques';
+            document.getElementById('customModuleGroup').style.display = 'none';
+            moduleSelect.focus();
+
+            sauvegarderDonnees();
+            afficherModules();
+        }
+
+        function afficherModules() {
+            const container = document.getElementById('modulesAffiches');
+            container.innerHTML = '';
+
+            if (modules.length === 0) {
+                container.innerHTML = '<div class="empty-state">Aucun module enregistré pour le moment. Ajoutez-en un ci-dessus !</div>';
+                // Effacer le résultat si aucun module n'est présent
+                document.getElementById('resultat').innerHTML = '';
+                return;
+            }
+
+            modules.forEach(module => {
+                const el = document.createElement('div');
+                el.className = 'module';
+                el.innerHTML = `
+                    <div class="module-info">
+                        <h3>${module.nom} <span style="color:#64748b; font-size:0.9em; font-weight:normal;">(Coeff: ${module.coefficient})</span></h3>
+                        <p>Notes : <strong style="color:var(--text-color)">${module.note1.toFixed(2)}</strong> et <strong style="color:var(--text-color)">${module.note2.toFixed(2)}</strong> | Moyenne du module : <strong style="color:var(--primary-color)">${module.moyenne.toFixed(2)}</strong></p>
+                    </div>
+                    <button onclick="supprimerModule(${module.id})" class="secondary" title="Supprimer ce module">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6"/></svg>
+                    </button>
+                `;
+                container.appendChild(el);
+            });
+        }
+
+        function supprimerModule(id) {
+            modules = modules.filter(m => m.id !== id);
+            sauvegarderDonnees();
+            afficherModules();
+            
+            // Recalculer si le résultat était affiché
+            if(document.getElementById('resultat').innerHTML !== '') {
+                calculerMoyennes();
+            }
+        }
+
+        function calculerMoyennes() {
+            hideError();
+            if (modules.length === 0) {
+                showError("Veuillez ajouter au moins un module pour calculer la moyenne générale.");
+                return;
+            }
+
+            let sommePonderee = 0;
+            let sommeCoefficients = 0;
+
+            let tableauHTML = `
+                <h3 style="margin-top: 30px; border-bottom: 2px solid var(--border-color); padding-bottom: 10px;">Résultats détaillés</h3>
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Module</th>
+                                <th>Notes</th>
+                                <th>Moyenne</th>
+                                <th>Coefficient</th>
+                                <th>Note pondérée</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+
+            modules.forEach(module => {
+                const notePonderee = module.moyenne * module.coefficient;
+                sommePonderee += notePonderee;
+                sommeCoefficients += module.coefficient;
+
+                tableauHTML += `
+                    <tr>
+                        <td><strong>${module.nom}</strong></td>
+                        <td>${module.note1.toFixed(2)} & ${module.note2.toFixed(2)}</td>
+                        <td>${module.moyenne.toFixed(2)}</td>
+                        <td>${module.coefficient}</td>
+                        <td>${notePonderee.toFixed(2)}</td>
+                    </tr>
+                `;
+            });
+
+            const moyenneGenerale = sommePonderee / sommeCoefficients;
+            const styleMoyenne = moyenneGenerale >= 10 ? 'color: var(--primary-color);' : 'color: var(--danger-color);';
+            const mention = getMention(moyenneGenerale);
+
+            tableauHTML += `
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="3" style="text-align: right;">Total des coefficients :</td>
+                                <td>${sommeCoefficients}</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td colspan="4" style="text-align: right;">Moyenne Générale :</td>
+                                <td style="${styleMoyenne}">${moyenneGenerale.toFixed(2)} / 20</td>
+                            </tr>
+                            <tr>
+                                <td colspan="5" style="text-align: center; color: #64748b; font-weight: normal; font-size: 0.95rem;">
+                                    Mention estimée : <strong>${mention}</strong>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            `;
+
+            document.getElementById('resultat').innerHTML = tableauHTML;
+            // Scroll jusqu'aux résultats
+            document.getElementById('resultat').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+        
+        function getMention(moyenne) {
+            if(moyenne < 10) return "Ajourné";
+            if(moyenne < 12) return "Passable";
+            if(moyenne < 14) return "Assez Bien";
+            if(moyenne < 16) return "Bien";
+            return "Très Bien";
+        }
+
+        function reinitialiser() {
+            if(confirm("Êtes-vous sûr de vouloir supprimer tous les modules enregistrés ?")) {
+                modules = [];
+                sauvegarderDonnees();
+                afficherModules();
+                document.getElementById('resultat').innerHTML = '';
+                hideError();
+            }
+        }
+    </script>
+</body>
+</html>
